@@ -14,7 +14,7 @@ import {
 import clsx from "clsx";
 
 interface Lessons {
-  [key: string]: string[];
+  [level: string]: { [lesson: string]: string[] };
 }
 
 // Local Button component to avoid build failure if the external file is missing.
@@ -52,26 +52,39 @@ const MyanmarTyping: React.FC = () => {
       wrongSoundRef.current = null;
     }
   }, []);
-  // const [selectedLesson, setSelectedLesson] = useState("lesson1");
 
+  // Load lessons.json once
   useEffect(() => {
     fetch("/lessons.json")
       .then((res) => res.json())
-      .then((data) => {
-        setLessons(data);
-        setCurrentList(data[level]?.[selectedLesson] || []);
-      })
-      .catch((err) => console.error("Failed to load lessons.json", err));
-  }, [level, selectedLesson]);
+      .then((data) => setLessons(data))
+      .catch(() => console.error("Failed to load lessons.json"));
+  }, []);
 
+  // When level changes → reset lesson to lesson1 (safe)
   useEffect(() => {
-    if (lessons[selectedLesson]) {
-      setCurrentList(lessons[selectedLesson]);
-      setCurrentIndex(0);
-      setInput("");
-      setModalOpen(false);
-    }
-  }, [selectedLesson, lessons]);
+    if (!lessons[level]) return;
+
+    const firstLesson = Object.keys(lessons[level])[0] || "lesson1";
+
+    setSelectedLesson(firstLesson);
+    setCurrentIndex(0);
+    setInput("");
+
+    setCurrentList(lessons[level][firstLesson] || []);
+  }, [level, lessons]);
+
+  // When selected lesson changes → load lesson text
+  useEffect(() => {
+    if (!lessons[level]) return;
+
+    const list = lessons[level][selectedLesson] || [];
+
+    setCurrentList(list);
+    setCurrentIndex(0);
+    setInput("");
+    setModalOpen(false);
+  }, [selectedLesson, level, lessons]);
 
   const currentText = currentList[currentIndex] || "";
 
@@ -177,7 +190,7 @@ const MyanmarTyping: React.FC = () => {
               <SelectContent>
                 <SelectGroup>
                   <SelectLabel>Lesson</SelectLabel>
-                  {Array.from({ length: 36 }, (_, i) => (
+                  {Array.from({ length: 39 }, (_, i) => (
                     <SelectItem key={i} value={`lesson${i + 1}`}>
                       Lesson {i + 1}
                     </SelectItem>
@@ -186,30 +199,6 @@ const MyanmarTyping: React.FC = () => {
               </SelectContent>
             </Select>
           </div>
-
-          {/* <select
-            value={level}
-            onChange={(e) => setLevel(e.target.value)}
-            className="w-full p-3 border rounded-lg text-lg mb-4"
-          >
-            <option value="basic">Basic</option>
-            <option value="intermediate">Intermediate</option>
-            <option value="advanced">Advanced</option>
-          </select> */}
-
-          {/* Lesson Selector */}
-
-          {/* <select
-            value={selectedLesson}
-            onChange={(e) => setSelectedLesson(e.target.value)}
-            className="w-full p-3 border rounded-lg text-lg mb-6 dark:bg-gray-800"
-          >
-            {Array.from({ length: 36 }, (_, i) => (
-              <option key={i} value={`lesson${i + 1}`}>
-                Lesson {i + 1}
-              </option>
-            ))}
-          </select> */}
 
           <div
             className={
@@ -253,13 +242,14 @@ const MyanmarTyping: React.FC = () => {
                 <button
                   className="w-full bg-green-600 text-white p-3 rounded-lg"
                   onClick={() => {
-                    const keys = Object.keys(lessons);
-                    const nextIndex = keys.indexOf(selectedLesson) + 1;
+                    const levelLessons = Object.keys(lessons[level] || {});
+                    const currentIdx = levelLessons.indexOf(selectedLesson);
+                    const nextIdx = currentIdx + 1;
 
                     setModalOpen(false);
 
-                    if (nextIndex < keys.length) {
-                      setSelectedLesson(keys[nextIndex]);
+                    if (nextIdx < levelLessons.length) {
+                      setSelectedLesson(levelLessons[nextIdx]);
                     }
                   }}
                 >
