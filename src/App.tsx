@@ -1,4 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
+// import { Button} from "./components/ui/button";
+
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+import clsx from "clsx";
 
 interface Lessons {
   [key: string]: string[];
@@ -28,6 +41,7 @@ const MyanmarTyping: React.FC = () => {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [shake, setShake] = useState(false);
+  const [level, setLevel] = useState("basic");
   const wrongSoundRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -38,7 +52,6 @@ const MyanmarTyping: React.FC = () => {
       wrongSoundRef.current = null;
     }
   }, []);
-  const [level, setLevel] = useState("basic");
   // const [selectedLesson, setSelectedLesson] = useState("lesson1");
 
   useEffect(() => {
@@ -109,38 +122,84 @@ const MyanmarTyping: React.FC = () => {
 
   return (
     <div
-      className={
-        dark
-          ? "dark bg-gray-900 text-white h-screen flex items-center"
-          : "bg-white text-black h-screen flex items-center"
-      }
+      className={clsx(
+        "min-h-screen w-full flex items-center justify-center",
+        dark ? "bg-gray-900 text-white" : "bg-white text-black"
+      )}
     >
-      {/* ONLY CHANGE: CENTER MAIN CONTENT */}
-      <div className="w-full flex justify-center">
-        <div className="text-center w-full max-w-2xl">
-          <div className="flex justify-between mb-6">
-            <h1 className="text-3xl font-bold">Myanmar Typing Tutor</h1>
-            <Button
-              className="px-3 py-1 border rounded-md"
-              onClick={() => setDark(!dark)}
-            >
-              {dark ? "Light Mode" : "Dark Mode"}
-            </Button>
+      {/* content */}
+
+      <div className="p-6 rounded-2xl shadow-lg">
+        <div className="flex justify-end">
+          <Button
+            className=" py-4 border rounded-md text-white"
+            onClick={() => setDark(!dark)}
+          >
+            {dark ? "Light Mode" : "Dark Mode"}
+          </Button>
+        </div>
+        <div className="text-center w-full">
+          <div className="">
+            <h1 className="text-3xl font-bold my-8 text-center border p-6 rounded-4xl border-amber-200">
+              Myanmar Easy Typing
+            </h1>
           </div>
 
-          {/* Level Selector */}
-          <select
+          <div className="flex space-x-6 mb-8">
+            {/* Level Selector */}
+
+            <Select
+              value={level}
+              onValueChange={(val: string) => setLevel(val)}
+            >
+              <SelectTrigger className="w-[180px] text-white text-xl">
+                <SelectValue placeholder="Select Level" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Level</SelectLabel>
+                  <SelectItem value="basic">Basic</SelectItem>
+                  <SelectItem value="intermediate">Intermediate</SelectItem>
+                  <SelectItem value="advanced">Advanced</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+
+            {/* Lesson Selector */}
+
+            <Select
+              value={selectedLesson}
+              onValueChange={(val: string) => setSelectedLesson(val)}
+            >
+              <SelectTrigger className="w-[180px] text-white text-xl">
+                <SelectValue placeholder="Select Lesson" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Lesson</SelectLabel>
+                  {Array.from({ length: 36 }, (_, i) => (
+                    <SelectItem key={i} value={`lesson${i + 1}`}>
+                      Lesson {i + 1}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* <select
             value={level}
             onChange={(e) => setLevel(e.target.value)}
-            className="w-full p-3 border rounded-lg text-lg mb-4 dark:bg-gray-800"
+            className="w-full p-3 border rounded-lg text-lg mb-4"
           >
             <option value="basic">Basic</option>
             <option value="intermediate">Intermediate</option>
             <option value="advanced">Advanced</option>
-          </select>
+          </select> */}
 
           {/* Lesson Selector */}
-          <select
+
+          {/* <select
             value={selectedLesson}
             onChange={(e) => setSelectedLesson(e.target.value)}
             className="w-full p-3 border rounded-lg text-lg mb-6 dark:bg-gray-800"
@@ -150,7 +209,7 @@ const MyanmarTyping: React.FC = () => {
                 Lesson {i + 1}
               </option>
             ))}
-          </select>
+          </select> */}
 
           <div
             className={
@@ -211,6 +270,8 @@ const MyanmarTyping: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* content */}
 
       <style>{`
         .animate-shake {
