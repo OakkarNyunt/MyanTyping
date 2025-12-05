@@ -1,3 +1,147 @@
+<div className="">
+        {/* Light & Dark Mode */}
+        <div className="flex justify-end">
+          <Button
+            className=" py-4 border rounded-md text-white"
+            onClick={() => setDark(!dark)}
+          >
+            {dark ? "Light Mode" : "Dark Mode"}
+          </Button>
+        </div>
+        {/* Light & Dark Mode */}
+
+        <div className="text-center ">
+          {/* Title */}
+          <div className="">
+            <h1 className="text-3xl font-bold my-8 text-center border p-6 rounded-4xl border-amber-200">
+              Myanmar Easy Typing
+            </h1>
+          </div>
+
+          {/* Level & Lessons */}
+          <div className="flex space-x-6 mb-8">
+            {/* Level Selector */}
+
+            <Select
+              value={level}
+              onValueChange={(val: string) => setLevel(val)}
+            >
+              <SelectTrigger className="w-[180px] text-white text-xl">
+                <SelectValue placeholder="Select Level" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Level</SelectLabel>
+                  <SelectItem value="basic">Basic</SelectItem>
+                  <SelectItem value="intermediate">Intermediate</SelectItem>
+                  <SelectItem value="advanced">Advanced</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+
+            {/* Lesson Selector */}
+
+            <Select
+              value={selectedLesson}
+              onValueChange={(val: string) => setSelectedLesson(val)}
+            >
+              <SelectTrigger className="w-[180px] text-white text-xl">
+                <SelectValue placeholder="Select Lesson" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Lesson</SelectLabel>
+                  {Array.from({ length: 39 }, (_, i) => (
+                    <SelectItem key={i} value={`lesson${i + 1}`}>
+                      Lesson {i + 1}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+          {/* Level & Lessons */}
+
+          {/* Text & Input Box */}
+          <div
+            className={
+              "text-3xl mb-10 font-bold leading-relaxed whitespace-pre-wrap transition-all " +
+              (shake ? "animate-shake" : "")
+            }
+          >
+            {renderHighlighted()}
+          </div>
+
+          <textarea
+            value={input}
+            onChange={handleChange}
+            rows={1}
+            placeholder="ဒီနေရာမှ စတင်ရိုက်ပါ....."
+            className="w-full p-4 border rounded-lg text-lg dark:bg-gray-800"
+          />
+
+          <div className="mt-4 text-gray-500 dark:text-gray-300">
+            {currentIndex + 1} / {currentList.length}
+          </div>
+
+          {/* Text & Input Box */}
+
+          {/* Dialog Box */}
+          {modalOpen && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-xl w-80 text-center">
+                <h2 className="text-2xl font-bold mb-4">
+                  🎉 Lesson Completed!
+                </h2>
+
+                <button
+                  className="w-full bg-blue-600 text-white p-3 rounded-lg mb-3"
+                  onClick={() => {
+                    setModalOpen(false);
+                    setCurrentIndex(0);
+                    setInput("");
+                  }}
+                >
+                  Try Again
+                </button>
+
+                <button
+                  className="w-full bg-green-600 text-white p-3 rounded-lg"
+                  onClick={() => {
+                    const levelLessons = Object.keys(lessons[level] || {});
+                    const currentIdx = levelLessons.indexOf(selectedLesson);
+                    const nextIdx = currentIdx + 1;
+
+                    setModalOpen(false);
+
+                    if (nextIdx < levelLessons.length) {
+                      setSelectedLesson(levelLessons[nextIdx]);
+                    }
+                  }}
+                >
+                  Next Lesson →
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+        {/* Dialog Box */}
+
+        <style>{`
+        .animate-shake {
+          animation: shake 0.15s linear;
+        }
+        @keyframes shake {
+          0% { transform: translateX(0px); }
+          25% { transform: translateX(-5px); }
+          50% { transform: translateX(5px); }
+          75% { transform: translateX(-5px); }
+          100% { transform: translateX(0px); }
+        }
+      `}</style>
+      </div>
+
+
 //   1: [
 //     "က",
 //     "ကာ",

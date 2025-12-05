@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/select";
 
 import clsx from "clsx";
+// import { Card } from "./components/ui/card";
+// import { Card } from "./components/ui/card";
 
 interface Lessons {
   [level: string]: { [lesson: string]: string[] };
@@ -136,36 +138,43 @@ const MyanmarTyping: React.FC = () => {
   return (
     <div
       className={clsx(
-        "min-h-screen w-full flex items-center justify-center",
-        dark ? "bg-gray-900 text-white" : "bg-white text-black"
+        "min-h-screen flex justify-center items-center",
+        dark ? "bg-black text-white" : "bg-gray-100 text-black"
       )}
     >
       {/* content */}
 
-      <div className="p-6 rounded-2xl shadow-lg">
-        <div className="flex justify-end">
+      <div className="lg:min-w-2xl md:min-w-xl sm:min-w-sm w-full p-6 container mx-auto">
+        {/* Title */}
+        <div className="">
+          <p className="lg:text-3xl text-xl font-bold mb-4 text-center">
+            Myanmar Easy Typing
+          </p>
+        </div>
+        {/* Light & Dark Mode */}
+        <div className="flex justify-end mb-4 mx-auto">
           <Button
-            className=" py-4 border rounded-md text-white"
+            className="border rounded-md text-white"
             onClick={() => setDark(!dark)}
           >
-            {dark ? "Light Mode" : "Dark Mode"}
+            <div className="flex space-x-2">
+              <div className="">{dark ? "☀️" : "🌙"}</div>
+              <div className="">{dark ? "Light Mode" : "Dark Mode"}</div>
+            </div>
           </Button>
         </div>
-        <div className="text-center w-full">
-          <div className="">
-            <h1 className="text-3xl font-bold my-8 text-center border p-6 rounded-4xl border-amber-200">
-              Myanmar Easy Typing
-            </h1>
-          </div>
+        {/* Light & Dark Mode */}
 
-          <div className="flex space-x-6 mb-8">
+        <div className="text-center ">
+          {/* Level & Lessons */}
+          <div className="flex justify-center space-x-6 my-8">
             {/* Level Selector */}
 
             <Select
               value={level}
               onValueChange={(val: string) => setLevel(val)}
             >
-              <SelectTrigger className="w-[180px] text-white text-xl">
+              <SelectTrigger className="w-[230px] text-white">
                 <SelectValue placeholder="Select Level" />
               </SelectTrigger>
               <SelectContent>
@@ -184,7 +193,7 @@ const MyanmarTyping: React.FC = () => {
               value={selectedLesson}
               onValueChange={(val: string) => setSelectedLesson(val)}
             >
-              <SelectTrigger className="w-[180px] text-white text-xl">
+              <SelectTrigger className="w-[230px] text-white text-xl">
                 <SelectValue placeholder="Select Lesson" />
               </SelectTrigger>
               <SelectContent>
@@ -199,10 +208,12 @@ const MyanmarTyping: React.FC = () => {
               </SelectContent>
             </Select>
           </div>
+          {/* Level & Lessons */}
 
+          {/* Text & Input Box */}
           <div
             className={
-              "text-3xl mb-10 leading-relaxed whitespace-pre-wrap transition-all " +
+              "text-3xl mb-10  font-bold leading-relaxed whitespace-pre-wrap transition-all " +
               (shake ? "animate-shake" : "")
             }
           >
@@ -212,19 +223,22 @@ const MyanmarTyping: React.FC = () => {
           <textarea
             value={input}
             onChange={handleChange}
-            rows={4}
-            placeholder="Start typing here..."
-            className="w-full p-4 border rounded-lg text-lg dark:bg-gray-800"
+            rows={3}
+            placeholder="ဒီနေရာမှ စတင်ရိုက်ပါ........"
+            className="w-8/12 p-4 border rounded-lg text-lg"
           />
 
-          <div className="mt-4 text-gray-500 dark:text-gray-300">
+          {/* <div className="mt-4 text-gray-500 dark:text-gray-300">
             {currentIndex + 1} / {currentList.length}
-          </div>
+          </div> */}
 
+          {/* Text & Input Box */}
+
+          {/* Dialog Box */}
           {modalOpen && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
               <div className="bg-white dark:bg-gray-800 p-6 rounded-xl w-80 text-center">
-                <h2 className="text-2xl font-bold mb-4">
+                <h2 className="text-black font-bold  text-2xl mb-4 ">
                   🎉 Lesson Completed!
                 </h2>
 
@@ -259,11 +273,9 @@ const MyanmarTyping: React.FC = () => {
             </div>
           )}
         </div>
-      </div>
+        {/* Dialog Box */}
 
-      {/* content */}
-
-      <style>{`
+        <style>{`
         .animate-shake {
           animation: shake 0.15s linear;
         }
@@ -275,6 +287,9 @@ const MyanmarTyping: React.FC = () => {
           100% { transform: translateX(0px); }
         }
       `}</style>
+      </div>
+
+      {/* content */}
     </div>
   );
 };
