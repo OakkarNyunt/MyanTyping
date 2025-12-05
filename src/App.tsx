@@ -1,7 +1,4 @@
-// FULL UPDATED FILE WITH TIMER — NOTHING ELSE CHANGED
-
 import React, { useState, useEffect, useRef } from "react";
-// import { Button} from "./components/ui/button";
 
 import {
   Select,
@@ -14,7 +11,6 @@ import {
 } from "@/components/ui/select";
 
 import clsx from "clsx";
-// import { Card } from "./components/ui/card";
 
 interface Lessons {
   [level: string]: { [lesson: string]: string[] };
@@ -51,10 +47,11 @@ const MyanmarTyping: React.FC = () => {
   const [isRunning, setIsRunning] = useState(false);
   const timerRef = useRef<number | null>(null);
 
-  // Helper: Reset Timer
   const resetTimer = () => {
-    resetTimer();
-    timerRef.current = null;
+    if (timerRef.current !== null) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
     setIsRunning(false);
     setTime(0);
   };
@@ -63,7 +60,7 @@ const MyanmarTyping: React.FC = () => {
   useEffect(() => {
     try {
       wrongSoundRef.current = new Audio("/wrong.mp3");
-    } catch (e) {
+    } catch {
       wrongSoundRef.current = null;
     }
   }, []);
@@ -75,11 +72,20 @@ const MyanmarTyping: React.FC = () => {
       .catch(() => console.error("Failed to load lessons.json"));
   }, []);
 
+  // Cleanup timer when unmounting
+  useEffect(() => {
+    return () => {
+      if (timerRef.current !== null) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, []);
+
   // When level changes
   useEffect(() => {
-    if (!lessons[level]) return;
+    if (!lessonAvailable()) return;
 
-    const firstLesson = Object.keys(lessons[level])[0] || "lesson1";
+    const firstLesson = sortedLessons()[0] || "lesson1";
 
     setSelectedLesson(firstLesson);
     setCurrentIndex(0);
@@ -87,19 +93,12 @@ const MyanmarTyping: React.FC = () => {
 
     setCurrentList(lessons[level][firstLesson] || []);
 
-    // RESET TIMER
-    if (timerRef.current !== null) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-
-    setIsRunning(false);
-    setTime(0);
+    resetTimer();
   }, [level, lessons]);
 
   // When lesson changes
   useEffect(() => {
-    if (!lessons[level]) return;
+    if (!lessonAvailable()) return;
 
     const list = lessons[level][selectedLesson] || [];
 
@@ -107,16 +106,15 @@ const MyanmarTyping: React.FC = () => {
     setCurrentIndex(0);
     setInput("");
     setModalOpen(false);
-
-    // RESET TIMER
-    if (timerRef.current !== null) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-
-    setIsRunning(false);
-    setTime(0);
+    resetTimer();
   }, [selectedLesson, level, lessons]);
+
+  const lessonAvailable = () => !!lessons[level];
+  const sortedLessons = () =>
+    Object.keys(lessons[level] || {}).sort(
+      (a, b) =>
+        Number(a.replace("lesson", "")) - Number(b.replace("lesson", ""))
+    );
 
   const currentText = currentList[currentIndex] || "";
 
@@ -124,7 +122,7 @@ const MyanmarTyping: React.FC = () => {
     const value = e.target.value;
 
     // START TIMER ON FIRST TYPE
-    if (!isRunning) {
+    if (!isRunning && currentText.length > 0) {
       setIsRunning(true);
       timerRef.current = setInterval(() => {
         setTime((t) => t + 1);
@@ -133,6 +131,7 @@ const MyanmarTyping: React.FC = () => {
 
     setInput(value);
 
+    // Wrong character alert
     if (value.length > 0 && currentText.length >= value.length) {
       if (value[value.length - 1] !== currentText[value.length - 1]) {
         setShake(true);
@@ -141,18 +140,12 @@ const MyanmarTyping: React.FC = () => {
       }
     }
 
+    // Completed current text
     if (value === currentText && currentText !== "") {
       setTimeout(() => {
         setInput("");
 
-        // STOP & RESET TIMER
-        if (timerRef.current !== null) {
-          clearInterval(timerRef.current);
-          timerRef.current = null;
-        }
-
-        setIsRunning(false);
-        setTime(0);
+        resetTimer();
 
         if (currentIndex + 1 < currentList.length) {
           setCurrentIndex(currentIndex + 1);
@@ -191,17 +184,19 @@ const MyanmarTyping: React.FC = () => {
     >
       <div className="lg:min-w-2xl md:min-w-xl sm:min-w-sm w-full p-6 container mx-auto">
         {/* Title */}
-        <p className="lg:text-3xl text-xl font-bold mb-2 text-center">
+        <p className="lg:text-3xl md:text-2xl text-xl font-bold mb-2 text-center">
           Myanmar Easy Typing
         </p>
 
         {/* TIMER */}
-        <div className="text-center text-xl flex items-center justify-center space-x-2 mb-4">
-          <span>⏱️</span>
-          <span>
-            {String(Math.floor(time / 60)).padStart(2, "0")}:
-            {String(time % 60).padStart(2, "0")}
-          </span>
+        <div className="text-center text-xl flex items-center justify-center space-x-2 my-4">
+          <div className="rounded-2xl p-2 border-2 border-green-500">
+            <span>⏱️</span>
+            <span>
+              {String(Math.floor(time / 60)).padStart(2, "0")}:
+              {String(time % 60).padStart(2, "0")}
+            </span>
+          </div>
         </div>
 
         {/* Light/Dark Mode */}
@@ -217,14 +212,12 @@ const MyanmarTyping: React.FC = () => {
           </Button>
         </div>
 
-        <div className="text-center ">
+        <div className="text-center">
           {/* Selectors */}
           <div className="flex justify-center space-x-6 my-8">
-            <Select
-              value={level}
-              onValueChange={(val: string) => setLevel(val)}
-            >
-              <SelectTrigger className="w-[230px] text-white">
+            {/* LEVEL SELECT */}
+            <Select value={level} onValueChange={setLevel}>
+              <SelectTrigger className="w-[230px]">
                 <SelectValue placeholder="Select Level" />
               </SelectTrigger>
               <SelectContent>
@@ -237,19 +230,17 @@ const MyanmarTyping: React.FC = () => {
               </SelectContent>
             </Select>
 
-            <Select
-              value={selectedLesson}
-              onValueChange={(val: string) => setSelectedLesson(val)}
-            >
-              <SelectTrigger className="w-[230px] text-white text-xl">
+            {/* LESSON SELECT — ONLY JSON LESSONS */}
+            <Select value={selectedLesson} onValueChange={setSelectedLesson}>
+              <SelectTrigger className="w-[230px] text-xl">
                 <SelectValue placeholder="Select Lesson" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
                   <SelectLabel>Lesson</SelectLabel>
-                  {Array.from({ length: 39 }, (_, i) => (
-                    <SelectItem key={i} value={`lesson${i + 1}`}>
-                      Lesson {i + 1}
+                  {sortedLessons().map((lesson) => (
+                    <SelectItem key={lesson} value={lesson}>
+                      {lesson.replace("lesson", "Lesson ")}
                     </SelectItem>
                   ))}
                 </SelectGroup>
@@ -259,7 +250,7 @@ const MyanmarTyping: React.FC = () => {
 
           <div
             className={
-              "text-3xl mb-10  font-bold leading-relaxed whitespace-pre-wrap transition-all " +
+              "text-3xl mb-10 font-bold leading-relaxed whitespace-pre-wrap transition-all " +
               (shake ? "animate-shake" : "")
             }
           >
@@ -277,44 +268,35 @@ const MyanmarTyping: React.FC = () => {
           {modalOpen && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
               <div className="bg-white dark:bg-gray-800 p-6 rounded-xl w-80 text-center">
-                <h2 className="text-black font-bold text-2xl mb-4">
+                <h2 className="font-bold text-2xl mb-4">
                   🎉 Lesson Completed!
                 </h2>
 
                 <button
-                  className="w-full bg-blue-600 text-white p-3 rounded-lg mb-3"
+                  className="w-full bg-blue-600 p-3 rounded-lg mb-3"
                   onClick={() => {
                     setModalOpen(false);
                     setCurrentIndex(0);
                     setInput("");
-
-                    if (timerRef.current !== null) {
-                      clearInterval(timerRef.current);
-                      timerRef.current = null;
-                    }
-
-                    setIsRunning(false);
-                    setTime(0);
+                    resetTimer();
                   }}
                 >
-                  Try Again
+                  <span className="text-white font-bold">Try Again</span>
                 </button>
 
                 <button
-                  className="w-full bg-green-600 text-white p-3 rounded-lg"
+                  className="w-full bg-green-600 p-3 rounded-lg"
                   onClick={() => {
-                    const levelLessons = Object.keys(lessons[level] || {});
-                    const currentIdx = levelLessons.indexOf(selectedLesson);
-                    const nextIdx = currentIdx + 1;
+                    const levelLessons = sortedLessons();
+                    const idx = levelLessons.indexOf(selectedLesson);
+                    const next = levelLessons[idx + 1];
 
                     setModalOpen(false);
 
-                    if (nextIdx < levelLessons.length) {
-                      setSelectedLesson(levelLessons[nextIdx]);
-                    }
+                    if (next) setSelectedLesson(next);
                   }}
                 >
-                  Next Lesson →
+                  <span className="text-white font-bold">Next Lesson →</span>
                 </button>
               </div>
             </div>
