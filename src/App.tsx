@@ -36,7 +36,7 @@ const MyanmarTyping: React.FC = () => {
   const [currentList, setCurrentList] = useState<string[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [input, setInput] = useState("");
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useState(true);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [shake, setShake] = useState(false);
@@ -253,8 +253,8 @@ const MyanmarTyping: React.FC = () => {
       "Period",
       "Slash",
     ],
-    // Space / modifiers row
-    ["ControlLeft", "AltLeft", "Space", "AltRight", "ControlRight"],
+    // Bottom row: single Ctrl + Space
+    ["Control", "Space"],
   ];
 
   // Helper: get character for a key given modifiers
@@ -277,7 +277,18 @@ const MyanmarTyping: React.FC = () => {
   };
 
   const processInput = (newInput: string) => {
-    // update input
+    // Automatic reorder for 'ေ' + consonant
+    if (
+      newInput.length >= 2 &&
+      newInput[newInput.length - 1] !== " " && // ignore spaces
+      newInput[newInput.length - 1] !== "ေ" &&
+      newInput[newInput.length - 2] === "‌ေ"
+    ) {
+      const lastChar = newInput[newInput.length - 1];
+      const beforeE = newInput.slice(0, newInput.length - 2);
+      newInput = beforeE + lastChar + "‌ေ"; // reorder
+    }
+
     setInput(newInput);
 
     // start timer if needed
@@ -366,28 +377,23 @@ const MyanmarTyping: React.FC = () => {
   // Virtual key click (on-screen)
   const handleVirtualKey = (code: string) => {
     const shift = modifierState.Shift;
-    const alt = modifierState.Alt;
-    const ch = charForKey(code, shift, alt);
+    const ch = charForKey(code, shift, false);
 
     setPressedPhysical((p) => ({ ...p, [code]: true }));
     setTimeout(() => {
       setPressedPhysical((p) => ({ ...p, [code]: false }));
     }, 120);
 
-    if (code === "ControlLeft" || code === "ControlRight") {
+    if (code === "Control") {
       setModifierState((m) => ({ ...m, Control: !m.Control }));
       return;
     }
-    if (code === "AltLeft" || code === "AltRight") {
-      setModifierState((m) => ({ ...m, Alt: !m.Alt }));
-      return;
-    }
+
     if (code === "Space") {
       processInput(input + " ");
       return;
     }
 
-    // emulate pressing shift toggle on virtual keyboard
     if (code === "ShiftLeft" || code === "ShiftRight") {
       setModifierState((m) => ({ ...m, Shift: !m.Shift }));
       return;
@@ -421,29 +427,90 @@ const MyanmarTyping: React.FC = () => {
   // get key display label and classes
   const keyLabel = (code: string) => {
     const e = KEY_MAP[code];
-    if (!e) return code;
-    // show active layer char if present, else label
-    if (modifierState.Alt && e.alt) return e.alt;
-    if (modifierState.Shift && e.shift) return e.shift;
-    if (e.base) return e.base;
-    if (e.label) return e.label;
-    return code;
+    if (!e) return { upper: "", middle: code, lower: "" };
+
+    return {
+      upper: e.shift || "",
+      middle: e.label || "",
+      lower: e.base || "",
+    };
   };
 
-  const keyClasses = (code: string) => {
+  const keyClasses = (code: string, rowIndex: number) => {
     const pressed = !!pressedPhysical[code];
     const activeNext =
-      code &&
-      charForKey(code, modifierState.Shift, modifierState.Alt) === nextChar;
+      code && charForKey(code, modifierState.Shift, false) === nextChar;
+
+    // Base styles
     let base =
-      "px-3 py-2 rounded-md border select-none inline-flex items-center justify-center text-lg min-w-[44px]";
-    if (pressed) base += " bg-sky-300 ring-2 ring-sky-500";
-    else if (activeNext) base += " bg-yellow-200 ring-2 ring-yellow-400";
+      "flex flex-col items-center justify-center select-none transition-all duration-150 shadow-md border rounded-xl";
+
+    // Adjust key size per row (top row smaller)
+    const height = rowIndex === 0 ? "h-12" : "h-14";
+    const minWidth =
+      code === "Space"
+        ? "min-w-[60%]"
+        : code === "ShiftLeft" || code === "ShiftRight" || code === "Control"
+        ? "min-w-[60px]"
+        : "min-w-[50px]"; // slightly bigger than before
+
+    base += ` ${height} ${minWidth} px-3 py-1`;
+
+    // Theme
+    const theme = KEYBOARD_THEMES[keyboardTheme];
+    base += ` ${theme.bg} ${theme.text}`;
+
+    // Add subtle border gradient
+    base += " border-gray-400 dark:border-gray-700";
+
+    // Pressed state
+    if (pressed) {
+      base += " translate-y-[2px] shadow-inner shadow-black bg-opacity-90";
+    }
+    // Next key hint
+    else if (activeNext) {
+      base += " ring-2 ring-yellow-400";
+    }
+
+    // Modifier key
+    if (code === "ShiftLeft" || code === "ShiftRight" || code === "Control") {
+      base += " bg-gray-400 dark:bg-gray-600 text-white font-bold shadow-inner";
+    }
+
+    // Hover effect
+    base += " hover:brightness-105 hover:scale-105";
+
     return base;
   };
 
   // textarea reference to focus
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  // Add this near your other state hooks
+  const [keyboardTheme, setKeyboardTheme] = useState("blue");
+
+  const KEYBOARD_THEMES: Record<string, { bg: string; text: string }> = {
+    blue: {
+      bg: "bg-blue-200 dark:bg-blue-700",
+      text: "text-black dark:text-white",
+    },
+    green: {
+      bg: "bg-green-200 dark:bg-green-700",
+      text: "text-black dark:text-white",
+    },
+    pink: {
+      bg: "bg-pink-200 dark:bg-pink-700",
+      text: "text-black dark:text-white",
+    },
+    yellow: {
+      bg: "bg-yellow-200 dark:bg-yellow-700",
+      text: "text-black dark:text-white",
+    },
+    purple: {
+      bg: "bg-purple-200 dark:bg-purple-700",
+      text: "text-black dark:text-white",
+    },
+  };
 
   return (
     <div
@@ -538,6 +605,23 @@ const MyanmarTyping: React.FC = () => {
             className="w-8/12 p-4 border rounded-lg text-lg"
           />
 
+          <div className="flex justify-center space-x-2 my-4">
+            {Object.keys(KEYBOARD_THEMES).map((theme) => (
+              <span
+                key={theme}
+                onClick={() => setKeyboardTheme(theme)}
+                className={clsx(
+                  "w-8 h-8 rounded-full border-2",
+                  keyboardTheme === theme
+                    ? "ring-2 ring-black dark:ring-white"
+                    : "",
+                  KEYBOARD_THEMES[theme].bg
+                )}
+                aria-label={`${theme} keyboard theme`}
+              />
+            ))}
+          </div>
+
           {/* On-screen physical-style keyboard */}
           <div className="mt-6 flex flex-col items-center space-y-2 select-none">
             {/* Modifier indicators */}
@@ -557,24 +641,14 @@ const MyanmarTyping: React.FC = () => {
             {KEY_ROWS.map((row, rIdx) => (
               <div
                 key={rIdx}
-                className="flex items-center justify-center space-x-2"
+                className={`flex items-center justify-center space-x-2 mb-2`}
               >
                 {row.map((code) => (
                   <div
                     key={code}
                     onMouseDown={(e) => {
                       e.preventDefault();
-                      // for modifiers, toggle state
-                      if (
-                        code.startsWith("Shift") ||
-                        code.startsWith("Control") ||
-                        code.startsWith("Alt")
-                      ) {
-                        handleVirtualKey(code);
-                        return;
-                      }
                       handleVirtualKey(code);
-                      // focus textarea for subsequent typing
                       textareaRef.current?.focus();
                     }}
                     onTouchStart={(e) => {
@@ -582,13 +656,14 @@ const MyanmarTyping: React.FC = () => {
                       handleVirtualKey(code);
                       textareaRef.current?.focus();
                     }}
-                    className={keyClasses(code)}
+                    className={keyClasses(code, rIdx)}
                   >
-                    <div className="text-base leading-none">
-                      {keyLabel(code)}
-                    </div>
-                    <div className="text-xs opacity-60">
-                      {KEY_MAP[code]?.label ?? ""}
+                    <div className="flex flex-col items-center justify-center h-full w-full">
+                      <div className="text-[12px]">{keyLabel(code).upper}</div>
+                      <div className="text-xs font-semibold">
+                        {keyLabel(code).middle}
+                      </div>
+                      <div className="text-[12px]">{keyLabel(code).lower}</div>
                     </div>
                   </div>
                 ))}
