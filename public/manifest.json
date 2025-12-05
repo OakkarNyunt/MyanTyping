@@ -1,0 +1,21 @@
+{
+  "short_name": "MyanType",
+  "name": "Myanmar Easy Typing",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#10b981",
+  "icons": [
+    {
+      "src": "/icons/flower.jpg",
+      "sizes": "192x192",
+      "type": "image/jpg"
+    },
+    {
+      "src": "/icons/flower1.jpg",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
