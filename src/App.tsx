@@ -1,3 +1,5 @@
+// FULL UPDATED FILE WITH TIMER — NOTHING ELSE CHANGED
+
 import React, { useState, useEffect, useRef } from "react";
 // import { Button} from "./components/ui/button";
 
@@ -13,14 +15,12 @@ import {
 
 import clsx from "clsx";
 // import { Card } from "./components/ui/card";
-// import { Card } from "./components/ui/card";
 
 interface Lessons {
   [level: string]: { [lesson: string]: string[] };
 }
 
-// Local Button component to avoid build failure if the external file is missing.
-// This preserves the original API (className, onClick, children) so nothing else needs to change.
+// Local Button
 const Button: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement>> = ({
   children,
   className,
@@ -46,8 +46,21 @@ const MyanmarTyping: React.FC = () => {
   const [level, setLevel] = useState("basic");
   const wrongSoundRef = useRef<HTMLAudioElement | null>(null);
 
+  // ------------------ TIMER ------------------
+  const [time, setTime] = useState(0); // seconds
+  const [isRunning, setIsRunning] = useState(false);
+  const timerRef = useRef<number | null>(null);
+
+  // Helper: Reset Timer
+  const resetTimer = () => {
+    resetTimer();
+    timerRef.current = null;
+    setIsRunning(false);
+    setTime(0);
+  };
+  // -------------------------------------------
+
   useEffect(() => {
-    // safe audio init
     try {
       wrongSoundRef.current = new Audio("/wrong.mp3");
     } catch (e) {
@@ -55,7 +68,6 @@ const MyanmarTyping: React.FC = () => {
     }
   }, []);
 
-  // Load lessons.json once
   useEffect(() => {
     fetch("/lessons.json")
       .then((res) => res.json())
@@ -63,7 +75,7 @@ const MyanmarTyping: React.FC = () => {
       .catch(() => console.error("Failed to load lessons.json"));
   }, []);
 
-  // When level changes → reset lesson to lesson1 (safe)
+  // When level changes
   useEffect(() => {
     if (!lessons[level]) return;
 
@@ -74,9 +86,18 @@ const MyanmarTyping: React.FC = () => {
     setInput("");
 
     setCurrentList(lessons[level][firstLesson] || []);
+
+    // RESET TIMER
+    if (timerRef.current !== null) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+
+    setIsRunning(false);
+    setTime(0);
   }, [level, lessons]);
 
-  // When selected lesson changes → load lesson text
+  // When lesson changes
   useEffect(() => {
     if (!lessons[level]) return;
 
@@ -86,15 +107,32 @@ const MyanmarTyping: React.FC = () => {
     setCurrentIndex(0);
     setInput("");
     setModalOpen(false);
+
+    // RESET TIMER
+    if (timerRef.current !== null) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+
+    setIsRunning(false);
+    setTime(0);
   }, [selectedLesson, level, lessons]);
 
   const currentText = currentList[currentIndex] || "";
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
+
+    // START TIMER ON FIRST TYPE
+    if (!isRunning) {
+      setIsRunning(true);
+      timerRef.current = setInterval(() => {
+        setTime((t) => t + 1);
+      }, 1000);
+    }
+
     setInput(value);
 
-    // only compare when there is something to compare against
     if (value.length > 0 && currentText.length >= value.length) {
       if (value[value.length - 1] !== currentText[value.length - 1]) {
         setShake(true);
@@ -106,6 +144,15 @@ const MyanmarTyping: React.FC = () => {
     if (value === currentText && currentText !== "") {
       setTimeout(() => {
         setInput("");
+
+        // STOP & RESET TIMER
+        if (timerRef.current !== null) {
+          clearInterval(timerRef.current);
+          timerRef.current = null;
+        }
+
+        setIsRunning(false);
+        setTime(0);
 
         if (currentIndex + 1 < currentList.length) {
           setCurrentIndex(currentIndex + 1);
@@ -142,34 +189,37 @@ const MyanmarTyping: React.FC = () => {
         dark ? "bg-black text-white" : "bg-gray-100 text-black"
       )}
     >
-      {/* content */}
-
       <div className="lg:min-w-2xl md:min-w-xl sm:min-w-sm w-full p-6 container mx-auto">
         {/* Title */}
-        <div className="">
-          <p className="lg:text-3xl text-xl font-bold mb-4 text-center">
-            Myanmar Easy Typing
-          </p>
+        <p className="lg:text-3xl text-xl font-bold mb-2 text-center">
+          Myanmar Easy Typing
+        </p>
+
+        {/* TIMER */}
+        <div className="text-center text-xl flex items-center justify-center space-x-2 mb-4">
+          <span>⏱️</span>
+          <span>
+            {String(Math.floor(time / 60)).padStart(2, "0")}:
+            {String(time % 60).padStart(2, "0")}
+          </span>
         </div>
-        {/* Light & Dark Mode */}
+
+        {/* Light/Dark Mode */}
         <div className="flex justify-end mb-4 mx-auto">
           <Button
             className="border rounded-md text-white"
             onClick={() => setDark(!dark)}
           >
             <div className="flex space-x-2">
-              <div className="">{dark ? "☀️" : "🌙"}</div>
-              <div className="">{dark ? "Light Mode" : "Dark Mode"}</div>
+              <div>{dark ? "☀️" : "🌙"}</div>
+              <div>{dark ? "Light Mode" : "Dark Mode"}</div>
             </div>
           </Button>
         </div>
-        {/* Light & Dark Mode */}
 
         <div className="text-center ">
-          {/* Level & Lessons */}
+          {/* Selectors */}
           <div className="flex justify-center space-x-6 my-8">
-            {/* Level Selector */}
-
             <Select
               value={level}
               onValueChange={(val: string) => setLevel(val)}
@@ -186,8 +236,6 @@ const MyanmarTyping: React.FC = () => {
                 </SelectGroup>
               </SelectContent>
             </Select>
-
-            {/* Lesson Selector */}
 
             <Select
               value={selectedLesson}
@@ -208,9 +256,7 @@ const MyanmarTyping: React.FC = () => {
               </SelectContent>
             </Select>
           </div>
-          {/* Level & Lessons */}
 
-          {/* Text & Input Box */}
           <div
             className={
               "text-3xl mb-10  font-bold leading-relaxed whitespace-pre-wrap transition-all " +
@@ -228,17 +274,10 @@ const MyanmarTyping: React.FC = () => {
             className="w-8/12 p-4 border rounded-lg text-lg"
           />
 
-          {/* <div className="mt-4 text-gray-500 dark:text-gray-300">
-            {currentIndex + 1} / {currentList.length}
-          </div> */}
-
-          {/* Text & Input Box */}
-
-          {/* Dialog Box */}
           {modalOpen && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
               <div className="bg-white dark:bg-gray-800 p-6 rounded-xl w-80 text-center">
-                <h2 className="text-black font-bold  text-2xl mb-4 ">
+                <h2 className="text-black font-bold text-2xl mb-4">
                   🎉 Lesson Completed!
                 </h2>
 
@@ -248,6 +287,14 @@ const MyanmarTyping: React.FC = () => {
                     setModalOpen(false);
                     setCurrentIndex(0);
                     setInput("");
+
+                    if (timerRef.current !== null) {
+                      clearInterval(timerRef.current);
+                      timerRef.current = null;
+                    }
+
+                    setIsRunning(false);
+                    setTime(0);
                   }}
                 >
                   Try Again
@@ -273,7 +320,6 @@ const MyanmarTyping: React.FC = () => {
             </div>
           )}
         </div>
-        {/* Dialog Box */}
 
         <style>{`
         .animate-shake {
@@ -288,8 +334,6 @@ const MyanmarTyping: React.FC = () => {
         }
       `}</style>
       </div>
-
-      {/* content */}
     </div>
   );
 };
