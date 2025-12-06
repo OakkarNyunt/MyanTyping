@@ -522,7 +522,7 @@ const MyanmarTyping: React.FC = () => {
       <div className="lg:min-w-2xl md:min-w-xl sm:min-w-sm w-full p-6 container mx-auto">
         {/* Title */}
         <p className="lg:text-3xl text-xl font-bold mb-2 text-center">
-          Myanmar Easy Typing — Pyidaungsu Keyboard
+          Myanmar Easy Typing — ok Pyidaungsu Keyboard
         </p>
 
         {/* TIMER */}
