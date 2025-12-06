@@ -139,7 +139,7 @@ const MyanmarTyping: React.FC = () => {
     string,
     { base?: string; shift?: string; alt?: string; label?: string }
   > = {
-    Backquote: { base: "ေ", shift: "=", label: "`" }, // example
+    Backquote: { base: "ၐ", shift: "ဎ", label: "`" }, // example
     Digit1: { base: "၁", shift: "!", label: "1" },
     Digit2: { base: "၂", shift: "@", label: "2" },
     Digit3: { base: "၃", shift: "#", label: "3" },
@@ -254,7 +254,8 @@ const MyanmarTyping: React.FC = () => {
       "Slash",
     ],
     // Bottom row: single Ctrl + Space
-    ["Control", "Space"],
+    ["shift","Control", "Space"],
+
   ];
 
   // Helper: get character for a key given modifiers
@@ -276,51 +277,115 @@ const MyanmarTyping: React.FC = () => {
     }
   };
 
-  const processInput = (newInput: string) => {
-    // Automatic reorder for 'ေ' + consonant
-    if (
-      newInput.length >= 2 &&
-      newInput[newInput.length - 1] !== " " && // ignore spaces
-      newInput[newInput.length - 1] !== "ေ" &&
-      newInput[newInput.length - 2] === "‌ေ"
-    ) {
-      const lastChar = newInput[newInput.length - 1];
-      const beforeE = newInput.slice(0, newInput.length - 2);
-      newInput = beforeE + lastChar + "‌ေ"; // reorder
-    }
+  // const processInput = (newInput: string) => {
+  //   // Automatic reorder for 'ေ' + consonant
+  //   if (
+  //     newInput.length >= 2 &&
+  //     newInput[newInput.length - 1] !== " " && // ignore spaces
+  //     newInput[newInput.length - 1] !== "ေ" &&
+  //     newInput[newInput.length - 2] === "‌ေ"
+  //   ) {
+  //     const lastChar = newInput[newInput.length - 1];
+  //     const beforeE = newInput.slice(0, newInput.length - 2);
+  //     newInput = beforeE + lastChar + "‌ေ"; // reorder
+  //   }
 
-    setInput(newInput);
+  //   setInput(newInput);
 
-    // start timer if needed
-    startTimerIfNeeded(newInput);
+  //   // start timer if needed
+  //   startTimerIfNeeded(newInput);
 
-    // wrong character check
-    if (newInput.length > 0 && currentText.length >= newInput.length) {
-      if (newInput[newInput.length - 1] !== currentText[newInput.length - 1]) {
-        setShake(true);
-        wrongSoundRef.current?.play();
-        setTimeout(() => setShake(false), 150);
-      }
-    }
+  //   // wrong character check
+  //   if (newInput.length > 0 && currentText.length >= newInput.length) {
+  //     if (newInput[newInput.length - 1] !== currentText[newInput.length - 1]) {
+  //       setShake(true);
+  //       wrongSoundRef.current?.play();
+  //       setTimeout(() => setShake(false), 150);
+  //     }
+  //   }
 
-    // completion
-    if (newInput === currentText && currentText !== "") {
-      setTimeout(() => {
-        setInput("");
-        resetTimer();
-        if (currentIndex + 1 < currentList.length) {
-          setCurrentIndex((i) => i + 1);
-        } else {
-          setModalOpen(true);
-        }
-      }, 300);
-    }
+  //   // completion
+  //   if (newInput === currentText && currentText !== "") {
+  //     setTimeout(() => {
+  //       setInput("");
+  //       resetTimer();
+  //       if (currentIndex + 1 < currentList.length) {
+  //         setCurrentIndex((i) => i + 1);
+  //       } else {
+  //         setModalOpen(true);
+  //       }
+  //     }, 300);
+  //   }
 
-    // update last pressed char for UI
-    setLastPressedChar(newInput.length ? newInput[newInput.length - 1] : "");
-  };
+  //   // update last pressed char for UI
+  //   setLastPressedChar(newInput.length ? newInput[newInput.length - 1] : "");
+  // };
 
   // Physical keyboard handlers
+  
+  const processInput = (raw: string) => {
+  let value = raw;
+
+  // ---------------------------------------------------
+  // (1) Auto-reorder for "ေ + consonant"
+  // ---------------------------------------------------
+  // Unicode "e" vowel sometimes invisible, so we check exact code
+  const E_VOWEL = "‌ေ"; // your combining e (U+1031 + ZWSP? keep exact)
+
+  if (
+    value.length >= 2 &&
+    value[value.length - 1] !== " " &&
+    value[value.length - 1] !== E_VOWEL &&
+    value[value.length - 2] === E_VOWEL
+  ) {
+    const last = value[value.length - 1];
+    const before = value.slice(0, -2);
+    value = before + last + E_VOWEL;
+  }
+
+  // Set input
+  setInput(value);
+
+  // ---------------------------------------------------
+  // (2) Start timer
+  // ---------------------------------------------------
+  startTimerIfNeeded(value);
+
+  // ---------------------------------------------------
+  // (3) Wrong character shake check
+  // ---------------------------------------------------
+  const pos = value.length - 1;
+  if (pos >= 0 && currentText[pos] !== undefined) {
+    if (value[pos] !== currentText[pos]) {
+      setShake(true);
+      wrongSoundRef.current?.play();
+      setTimeout(() => setShake(false), 150);
+    }
+  }
+
+  // ---------------------------------------------------
+  // (4) Check completion
+  // ---------------------------------------------------
+  if (value === currentText && currentText.length > 0) {
+    setTimeout(() => {
+      setInput("");
+      resetTimer();
+
+      if (currentIndex + 1 < currentList.length) {
+        setCurrentIndex((i) => i + 1);
+      } else {
+        setModalOpen(true);
+      }
+    }, 300);
+  }
+
+  // ---------------------------------------------------
+  // (5) Update last pressed char
+  // ---------------------------------------------------
+  setLastPressedChar(value.length ? value[value.length - 1] : "");
+};
+
+  
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       // Update modifier state
@@ -448,11 +513,12 @@ const MyanmarTyping: React.FC = () => {
     // Adjust key size per row (top row smaller)
     const height = rowIndex === 0 ? "h-12" : "h-14";
     const minWidth =
-      code === "Space"
-        ? "min-w-[60%]"
-        : code === "ShiftLeft" || code === "ShiftRight" || code === "Control"
-        ? "min-w-[60px]"
-        : "min-w-[50px]"; // slightly bigger than before
+  code === "Space"
+    ? "min-w-[75%] h-16 text-lg"
+    : code === "ShiftLeft" || code === "ShiftRight" || code === "Control"
+    ? "min-w-[70px]"
+    : "min-w-[50px]";
+ // slightly bigger than before
 
     base += ` ${height} ${minWidth} px-3 py-1`;
 
@@ -469,7 +535,9 @@ const MyanmarTyping: React.FC = () => {
     }
     // Next key hint
     else if (activeNext) {
-      base += " ring-2 ring-yellow-400";
+      // base += " ring-2 ring-green-400";
+      // base += " bg-green-500 text-white font-bold shadow-lg scale-105";
+       base += " ring-4 ring-green-400 shadow-lg shadow-green-400/40 scale-105 bg-green-200/20";
     }
 
     // Modifier key
@@ -521,12 +589,12 @@ const MyanmarTyping: React.FC = () => {
     >
       <div className="lg:min-w-2xl md:min-w-xl sm:min-w-sm w-full p-6 container mx-auto">
         {/* Title */}
-        <p className="lg:text-3xl text-xl font-bold mb-2 text-center">
-          Myanmar Easy Typing — ok Pyidaungsu Keyboard
+        <p className="lg:text-3xl md:text-xl text-sm font-bold mb-12 text-center">
+          Myanmar Easy Typing — Pyidaungsu Keyboard
         </p>
 
         {/* TIMER */}
-        <div className="text-center text-xl flex items-center justify-center space-x-2 my-4">
+        <div className="text-center text-xl flex items-center justify-center space-x-2 mb-4">
           <div className="rounded-2xl p-2 border-2 border-green-500">
             <span>⏱️</span>
             <span>
@@ -551,7 +619,7 @@ const MyanmarTyping: React.FC = () => {
 
         <div className="text-center">
           {/* Selectors */}
-          <div className="flex justify-center space-x-6 my-6">
+          <div className="flex justify-center space-x-6 mb-6">
             {/* LEVEL SELECT */}
             <Select value={level} onValueChange={setLevel}>
               <SelectTrigger className="w-[230px]">
@@ -588,7 +656,7 @@ const MyanmarTyping: React.FC = () => {
           {/* Target text */}
           <div
             className={
-              "text-3xl mb-6 font-bold leading-relaxed whitespace-pre-wrap transition-all " +
+              "md:text-3xl text-xl  mb-6 font-bold leading-relaxed whitespace-pre-wrap transition-all " +
               (shake ? "animate-shake" : "")
             }
           >
@@ -600,9 +668,10 @@ const MyanmarTyping: React.FC = () => {
             ref={textareaRef}
             value={input}
             onChange={(e) => processInput(e.target.value)}
-            rows={3}
+            rows={2}
             placeholder="ဒီနေရာမှ စတင်ရိုက်ပါ........"
-            className="w-8/12 p-4 border rounded-lg text-lg"
+            className="w-8/12 p-4 border rounded-lg text-lg resize-none"
+            
           />
 
           <div className="flex justify-center space-x-2 my-4">
@@ -624,18 +693,7 @@ const MyanmarTyping: React.FC = () => {
 
           {/* On-screen physical-style keyboard */}
           <div className="mt-6 flex flex-col items-center space-y-2 select-none">
-            {/* Modifier indicators */}
-            <div className="mb-2 text-sm">
-              <span className="px-2">
-                Shift: {modifierState.Shift ? "ON" : "OFF"}
-              </span>
-              <span className="px-2">
-                Ctrl: {modifierState.Control ? "ON" : "OFF"}
-              </span>
-              <span className="px-2">
-                Alt: {modifierState.Alt ? "ON" : "OFF"}
-              </span>
-            </div>
+            
 
             {/* Rows */}
             {KEY_ROWS.map((row, rIdx) => (
@@ -658,9 +716,9 @@ const MyanmarTyping: React.FC = () => {
                     }}
                     className={keyClasses(code, rIdx)}
                   >
-                    <div className="flex flex-col items-center justify-center h-full w-full">
+                    <div className="flex flex-col items-center justify-center h-full w-full p-3">
                       <div className="text-[12px]">{keyLabel(code).upper}</div>
-                      <div className="text-xs font-semibold">
+                      <div className="text-xs font-bold">
                         {keyLabel(code).middle}
                       </div>
                       <div className="text-[12px]">{keyLabel(code).lower}</div>
@@ -684,9 +742,10 @@ const MyanmarTyping: React.FC = () => {
           {modalOpen && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
               <div className="bg-white dark:bg-gray-800 p-6 rounded-xl w-80 text-center">
-                <h2 className="font-bold text-2xl mb-4">
-                  🎉 Lesson Completed!
-                </h2>
+                <h2 className="font-bold text-2xl mb-4 dark:text-white text-black">
+  🎉 Lesson Completed!
+</h2>
+
 
                 <button
                   className="w-full bg-blue-600 p-3 rounded-lg mb-3"
