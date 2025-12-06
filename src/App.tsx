@@ -43,6 +43,8 @@ const MyanmarTyping: React.FC = () => {
   const [level, setLevel] = useState("basic");
   const wrongSoundRef = useRef<HTMLAudioElement | null>(null);
 
+  
+
   // -- Timer
   const [time, setTime] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
@@ -191,6 +193,11 @@ const MyanmarTyping: React.FC = () => {
 
     Space: { base: " ", shift: " ", label: "Space" },
     // Add more mappings if you need specific Alt layer characters.
+    ShiftLeft: { base: "", shift: "", label: "Shift" },
+ShiftRight: { base: "", shift: "", label: "Shift" },
+ControlLeft: { base: "", shift: "", label: "Ctrl" },
+ControlRight: { base: "", shift: "", label: "Ctrl" },
+
   };
 
   // Keyboard visual layout using physical key codes in rows
@@ -254,7 +261,8 @@ const MyanmarTyping: React.FC = () => {
       "Slash",
     ],
     // Bottom row: single Ctrl + Space
-    ["shift","Control", "Space"],
+    ["ShiftLeft", "ControlLeft", "Space"]
+
 
   ];
 
@@ -277,53 +285,7 @@ const MyanmarTyping: React.FC = () => {
     }
   };
 
-  // const processInput = (newInput: string) => {
-  //   // Automatic reorder for 'ေ' + consonant
-  //   if (
-  //     newInput.length >= 2 &&
-  //     newInput[newInput.length - 1] !== " " && // ignore spaces
-  //     newInput[newInput.length - 1] !== "ေ" &&
-  //     newInput[newInput.length - 2] === "‌ေ"
-  //   ) {
-  //     const lastChar = newInput[newInput.length - 1];
-  //     const beforeE = newInput.slice(0, newInput.length - 2);
-  //     newInput = beforeE + lastChar + "‌ေ"; // reorder
-  //   }
-
-  //   setInput(newInput);
-
-  //   // start timer if needed
-  //   startTimerIfNeeded(newInput);
-
-  //   // wrong character check
-  //   if (newInput.length > 0 && currentText.length >= newInput.length) {
-  //     if (newInput[newInput.length - 1] !== currentText[newInput.length - 1]) {
-  //       setShake(true);
-  //       wrongSoundRef.current?.play();
-  //       setTimeout(() => setShake(false), 150);
-  //     }
-  //   }
-
-  //   // completion
-  //   if (newInput === currentText && currentText !== "") {
-  //     setTimeout(() => {
-  //       setInput("");
-  //       resetTimer();
-  //       if (currentIndex + 1 < currentList.length) {
-  //         setCurrentIndex((i) => i + 1);
-  //       } else {
-  //         setModalOpen(true);
-  //       }
-  //     }, 300);
-  //   }
-
-  //   // update last pressed char for UI
-  //   setLastPressedChar(newInput.length ? newInput[newInput.length - 1] : "");
-  // };
-
-  // Physical keyboard handlers
-  
-  const processInput = (raw: string) => {
+const processInput = (raw: string) => {
   let value = raw;
 
   // ---------------------------------------------------
@@ -385,7 +347,8 @@ const MyanmarTyping: React.FC = () => {
   setLastPressedChar(value.length ? value[value.length - 1] : "");
 };
 
-  
+
+  // Physical keyboard handlers
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       // Update modifier state
@@ -417,6 +380,12 @@ const MyanmarTyping: React.FC = () => {
           processInput(input.slice(0, -1));
         }
         // Allow other keys (arrows etc.)
+
+        if (code === "ControlLeft") {
+  setModifierState(m => ({ ...m, Control: !m.Control }));
+  return;
+}
+
       }
     };
 
@@ -541,9 +510,10 @@ const MyanmarTyping: React.FC = () => {
     }
 
     // Modifier key
-    if (code === "ShiftLeft" || code === "ShiftRight" || code === "Control") {
-      base += " bg-gray-400 dark:bg-gray-600 text-white font-bold shadow-inner";
-    }
+    if (code === "ShiftLeft" || code === "ShiftRight" || code === "ControlLeft") {
+  base += " bg-gray-400 dark:bg-gray-600 text-white font-bold shadow-inner";
+}
+
 
     // Hover effect
     base += " hover:brightness-105 hover:scale-105";
