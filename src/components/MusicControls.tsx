@@ -1,6 +1,6 @@
 // components/MusicControls.tsx
 import React from "react";
-import Button from "./LocalButton";
+import Button from "@/components/LocalButton";
 
 interface MusicControlsProps {
   isMusicPlaying: boolean;

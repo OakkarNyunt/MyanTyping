@@ -141,8 +141,13 @@ export const KEY_ROWS: string[][] = [
 // 3. Music Playlist
 export const MUSIC_LIST = [
   "/sound/Always.mp3",
+  "/sound/Bunny Phyoe.mp3",
   "/sound/Anglebaby.mp3",
-  "/sound/Dj.mp3",
+  "/sound/letter i - zenith.mp3",
+  "/sound/Min Nae.mp3",
+  "/sound/Poe Kar.mp3",
+  "/sound/Thar Gan.mp3",
+  "/sound/Y Mask - Vacation.mp3",
   "/sound/HtetYan.mp3",
   "/sound/Kira.mp3",
   "/sound/Letter.mp3",

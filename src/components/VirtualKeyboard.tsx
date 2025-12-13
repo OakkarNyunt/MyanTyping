@@ -1,7 +1,7 @@
 // components/VirtualKeyboard.tsx
 import React, { useMemo } from "react";
 import { KEY_ROWS, KEYBOARD_THEMES, CHAR_TO_KEYS, E_VOWEL } from "@/type";
-import KeyboardKey from "./KeyboardKey";
+import KeyboardKey from "@/components/KeyboardKey";
 
 interface VirtualKeyboardProps {
   keyboardTheme: string;

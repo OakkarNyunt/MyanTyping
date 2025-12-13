@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import Button from "./LocalButton";
+import Button from "@/components/LocalButton";
 // Keep this import if it's from your project
 import type { Lessons } from "@/type";
 import clsx from "clsx";
