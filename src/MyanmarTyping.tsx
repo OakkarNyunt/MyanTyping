@@ -20,8 +20,6 @@ import Button from "./components/LocalButton"; // Assuming you update LocalButto
 import AboutDialog from "./components/AboutUs";
 import ProgressBar from "./components/ProgressBar";
 
-// import backgroundImage from "@/assets/image/background.jpg";
-
 // --- HELPER: Logic for next required character (Moved from inline to be a proper helper) ---
 
 const computeNextRequiredChar = (target: string, input: string): string => {
@@ -352,7 +350,6 @@ const MyanmarTyping: React.FC = () => {
     <div
       className={clsx(
         "min-h-screen flex justify-center items-center",
-        "bg-cover bg-fixed bg-no-repeat",
         dark ? "bg-black text-white" : "bg-gray-100 text-black"
       )}
     >
@@ -378,7 +375,7 @@ const MyanmarTyping: React.FC = () => {
         <Button
           onClick={() => setAboutModalOpen(true)} // <-- Open dialog on click
           className={clsx(
-            "text-sm px-3 py-1 rounded-full font-medium transition-colors",
+            "text-sm lg:px-3 py-1 hidden md:block rounded-full font-medium transition-colors",
             dark
               ? "bg-gray-700 text-gray-200 hover:bg-gray-600"
               : "bg-gray-200 text-gray-700 hover:bg-gray-300"

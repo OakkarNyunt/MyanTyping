@@ -52,7 +52,7 @@ const LessonControls: React.FC<LessonControlsProps> = ({
   return (
     <div className="text-center">
       {/* Timer, Dark Mode, About Us */}
-      <div className="text-xl flex items-center justify-center space-x-4 mb-6">
+      <div className="text-xl flex items-center justify-center space-x-4 mb-4">
         {/* ⏱️ 1. TIMER DISPLAY: Cleaner, dynamically colored border */}
         <div
           className={clsx(
