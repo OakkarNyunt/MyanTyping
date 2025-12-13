@@ -142,7 +142,7 @@ export const KEY_ROWS: string[][] = [
 export const MUSIC_LIST = [
   "/sound/Always.mp3",
   "/sound/Bunny Phyoe.mp3",
-  "/sound/Anglebaby.mp3",
+  "/sound/Thomaz.mp3",
   "/sound/letter i - zenith.mp3",
   "/sound/Min Nae.mp3",
   "/sound/Poe Kar.mp3",
