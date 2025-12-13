@@ -1,11 +1,6 @@
 // components/VirtualKeyboard.tsx
 import React, { useMemo } from "react";
-import {
-  KEY_ROWS,
-  KEYBOARD_THEMES,
-  CHAR_TO_KEYS,
-  E_VOWEL,
-} from "@/type";
+import { KEY_ROWS, KEYBOARD_THEMES, CHAR_TO_KEYS, E_VOWEL } from "@/type";
 import KeyboardKey from "./KeyboardKey";
 
 interface VirtualKeyboardProps {
@@ -57,7 +52,7 @@ const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
   }, [nextChar]);
 
   return (
-    <div className="mt-6 flex flex-col items-center space-y-2 select-none">
+    <div className="mt-4 flex flex-col items-center space-y-2 select-none">
       {/* Theme Selector */}
       <div className="flex justify-center space-x-2 my-4">
         {Object.keys(KEYBOARD_THEMES).map((theme) => (
@@ -65,9 +60,7 @@ const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
             key={theme}
             onClick={() => setKeyboardTheme(theme)}
             className={`w-8 h-8 rounded-full border-2 cursor-pointer ${
-              keyboardTheme === theme
-                ? "ring-2 ring-black dark:ring-white"
-                : ""
+              keyboardTheme === theme ? "ring-2 ring-black dark:ring-white" : ""
             } ${KEYBOARD_THEMES[theme].bg}`}
             aria-label={`${theme} keyboard theme`}
           />

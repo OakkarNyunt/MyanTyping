@@ -34,7 +34,7 @@ const TargetDisplay: React.FC<TargetDisplayProps> = ({
   return (
     <div
       className={clsx(
-        "md:text-3xl text-xl mb-6 font-bold leading-relaxed whitespace-pre-wrap transition-all",
+        "md:text-3xl text-xl font-bold leading-relaxed whitespace-pre-wrap transition-all",
         shake ? "animate-shake" : ""
       )}
     >

@@ -18,7 +18,7 @@ import TargetDisplay from "./components/TargetDisplay";
 import VirtualKeyboard from "./components/VirtualKeyboard";
 import Button from "./components/LocalButton"; // Assuming you update LocalButton.tsx to export default Button
 import AboutDialog from "./components/AboutUs";
-// import ProgressBar from "./components/ProgressBar";
+import ProgressBar from "./components/ProgressBar";
 
 // import backgroundImage from "@/assets/image/background.jpg";
 
@@ -99,6 +99,18 @@ const MyanmarTyping: React.FC = () => {
     () => computeNextRequiredChar(currentText, input),
     [currentText, input]
   );
+
+  // Progress calculation (correct chars only)
+  const correctCharCount = useMemo(() => {
+    let count = 0;
+    for (let i = 0; i < input.length; i++) {
+      if (input[i] === currentText[i]) count++;
+      else break; // stop on first mistake (RapidTyping behavior)
+    }
+    return count;
+  }, [input, currentText]);
+
+  const totalChars = currentText.length;
 
   // --- MUSIC SYSTEM STATE & LOGIC ---
   const musicRef = useRef<HTMLAudioElement | null>(null);
@@ -394,6 +406,14 @@ const MyanmarTyping: React.FC = () => {
               currentText={currentText}
               input={input}
               shake={shake}
+            />
+          </div>
+          {/* Progress Bar */}
+          <div className="w-7/12 lg:w-7/12 mx-auto">
+            <ProgressBar
+              current={correctCharCount}
+              total={totalChars}
+              dark={dark}
             />
           </div>
 
