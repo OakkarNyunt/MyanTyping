@@ -1,0 +1,20 @@
+{
+  "name": "Myanmar Easy Typing",
+  "short_name": "Myanmar Easy Typing",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "typinglogo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/typinglogo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
