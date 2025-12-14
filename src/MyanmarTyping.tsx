@@ -473,7 +473,7 @@ const MyanmarTyping: React.FC = () => {
                   resetTimer();
                 }}
               >
-                <span className="text-blue-600 font-bold">Try Again</span>
+                <span className=" font-bold">Try Again</span>
               </Button>
 
               <Button
@@ -486,7 +486,7 @@ const MyanmarTyping: React.FC = () => {
                   if (next) setSelectedLesson(next);
                 }}
               >
-                <span className="text-blue-600 font-bold">Next Lesson →</span>
+                <span className="font-bold">Next Lesson →</span>
               </Button>
             </div>
           </div>

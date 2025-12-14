@@ -76,8 +76,8 @@ const LessonControls: React.FC<LessonControlsProps> = ({
             className={clsx(
               "rounded-lg p-2 font-semibold transition-all duration-300 shadow-md",
               dark
-                ? "bg-gray-700 text-yellow-300 hover:bg-gray-600 hover:shadow-lg"
-                : "bg-blue-100 text-blue-800 hover:bg-blue-200 hover:shadow-lg"
+                ? "bg-gray-700 text-white hover:bg-gray-600 hover:shadow-lg"
+                : "bg-blue-100 text-black hover:bg-blue-200 hover:shadow-lg"
             )}
           >
             <div className="flex items-center space-x-2">
@@ -95,7 +95,7 @@ const LessonControls: React.FC<LessonControlsProps> = ({
       <div className="flex justify-center items-center flex-wrap gap-4">
         {/* LEVEL SELECT */}
         <Select value={level} onValueChange={setLevel}>
-          <SelectTrigger className="w-35 text-blue-600">
+          <SelectTrigger className="w-35">
             <SelectValue placeholder="Select Level" />
           </SelectTrigger>
           <SelectContent>
@@ -111,7 +111,7 @@ const LessonControls: React.FC<LessonControlsProps> = ({
 
         {/* LESSON SELECT */}
         <Select value={selectedLesson} onValueChange={setSelectedLesson}>
-          <SelectTrigger className="w-30 text-blue-600">
+          <SelectTrigger className="w-30">
             <SelectValue placeholder="Select Lesson" />
           </SelectTrigger>
           <SelectContent>
@@ -132,7 +132,7 @@ const LessonControls: React.FC<LessonControlsProps> = ({
           value={String(currentTrack)}
           onValueChange={(v) => setCurrentTrack(Number(v))}
         >
-          <SelectTrigger className="w-32.5 text-blue-600">
+          <SelectTrigger className="w-32.5">
             <SelectValue placeholder="Select Music" />
           </SelectTrigger>
           <SelectContent>
