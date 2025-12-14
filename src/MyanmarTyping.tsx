@@ -12,13 +12,13 @@ import {
 } from "@/type";
 
 // Import child components
-import LessonControls from "./components/LessonControls";
-import MusicControls from "./components/MusicControls";
-import TargetDisplay from "./components/TargetDisplay";
-import VirtualKeyboard from "./components/VirtualKeyboard";
-import Button from "./components/LocalButton"; // Assuming you update LocalButton.tsx to export default Button
-import AboutDialog from "./components/AboutUs";
-import ProgressBar from "./components/ProgressBar";
+import LessonControls from "@/components/LessonControls";
+import MusicControls from "@/components/MusicControls";
+import TargetDisplay from "@/components/TargetDisplay";
+import VirtualKeyboard from "@/components/VirtualKeyboard";
+import Button from "@/components/LocalButton"; // Assuming you update LocalButton.tsx to export default Button
+import AboutDialog from "@/components/AboutUs";
+import ProgressBar from "@/components/ProgressBar";
 
 // --- HELPER: Logic for next required character (Moved from inline to be a proper helper) ---
 
