@@ -17,7 +17,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
 }) => {
   return (
     <div className="flex items-center justify-center space-x-4 my-2">
-      <Button onClick={toggleMusic} className="px-4 py-2 text-blue-600">
+      <Button onClick={toggleMusic} className="px-4 py-2">
         {isMusicPlaying ? "⏸️ Pause" : "▶️ Play"}
       </Button>
       <div className="flex items-center justify-center space-x-4">
