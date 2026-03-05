@@ -1,7 +1,8 @@
 // types.ts
 
 // --- Constants: Vowels & Characters ---
-export const E_VOWEL = "‌ေ"; // Special Myanmar Vowel Sign E
+// export const E_VOWEL = "‌ေ"; // Special Myanmar Vowel Sign E
+export const E_VOWEL = "\u1031";
 
 // --- Types ---
 export interface Lessons {

@@ -95,7 +95,7 @@ const MyanmarTyping: React.FC = () => {
   const currentText = (currentList[currentIndex] || "") as string;
   const nextChar = useMemo(
     () => computeNextRequiredChar(currentText, input),
-    [currentText, input]
+    [currentText, input],
   );
 
   // Progress calculation (correct chars only)
@@ -188,9 +188,9 @@ const MyanmarTyping: React.FC = () => {
     () =>
       Object.keys(lessons[level] || {}).sort(
         (a, b) =>
-          Number(a.replace("lesson", "")) - Number(b.replace("lesson", ""))
+          Number(a.replace("lesson", "")) - Number(b.replace("lesson", "")),
       ),
-    [level, lessons]
+    [level, lessons],
   );
 
   // Initialize Lesson
@@ -350,7 +350,7 @@ const MyanmarTyping: React.FC = () => {
     <div
       className={clsx(
         "min-h-screen flex justify-center items-center",
-        dark ? "bg-black text-white" : "bg-gray-100 text-black"
+        dark ? "bg-black text-white" : "bg-gray-100 text-black",
       )}
     >
       <div className="lg:min-w-2xl md:min-w-xl sm:min-w-sm w-full p-4 container mx-auto">
@@ -378,7 +378,7 @@ const MyanmarTyping: React.FC = () => {
             "text-sm lg:px-3 py-1 hidden md:block rounded-full font-medium transition-colors",
             dark
               ? "bg-gray-700 text-gray-200 hover:bg-gray-600"
-              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              : "bg-gray-200 text-gray-700 hover:bg-gray-300",
           )}
         >
           ℹ️ info
