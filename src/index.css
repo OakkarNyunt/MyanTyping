@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Myanmar:wght@400;700&display=swap");
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -116,5 +118,7 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* ဒီနေရာမှာ font family ကို သတ်မှတ်ပေးပါ */
+    font-family: "Noto Sans Myanmar", sans-serif;
   }
 }

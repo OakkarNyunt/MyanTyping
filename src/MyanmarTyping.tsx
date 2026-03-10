@@ -420,12 +420,16 @@ const MyanmarTyping: React.FC = () => {
               ref={textareaRef}
               value={input}
               onChange={(e) => processInput(e.target.value)}
-              rows={2}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") e.preventDefault();
+              }}
+              rows={1}
               placeholder="ဒီနေရာမှ စတင်ရိုက်ပါ........"
+              // overflow-hidden နဲ့ white-space-nowrap ကို ထည့်ပေးပါ
               className={`${
                 dark ? "bg-gray-700 text-white" : "bg-white text-black"
-              } w-7/12 lg:w-7/12 p-2 shadow-lg shadow-lime-300 border rounded-lg text-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500`}
-              autoFocus // Added autoFocus for better UX
+              } w-7/12 lg:w-7/12 p-4 shadow-lg shadow-lime-300 border rounded-lg text-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 overflow-hidden whitespace-nowrap`}
+              autoFocus
             />
           </div>
         </div>
