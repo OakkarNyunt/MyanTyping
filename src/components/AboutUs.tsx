@@ -3,6 +3,7 @@ import React from "react";
 import clsx from "clsx";
 import image from "@/assets/image/Profile.jpg";
 import MTPRO from "@/assets/image/MT PRO.png";
+
 interface AboutDialogProps {
   isOpen: boolean;
   onClose: () => void;
@@ -16,21 +17,21 @@ const AboutDialog: React.FC<AboutDialogProps> = ({ isOpen, onClose, dark }) => {
   const headerClass = dark ? "text-white" : "text-black";
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
       <div
         className={clsx(
-          "relative p-8 rounded-xl shadow-2xl w-full max-w-md md:max-w-lg transition-transform duration-300 transform",
-          dark ? "bg-gray-800" : "bg-white"
+          "relative p-8 rounded-xl shadow-2xl w-full max-w-md md:max-w-lg transition-all duration-300",
+          dark ? "bg-gray-800" : "bg-white",
         )}
       >
         {/* Close Button */}
         <button
           onClick={onClose}
           className={clsx(
-            "absolute top-3 right-3 text-2xl font-bold",
+            "absolute top-3 right-3 text-2xl font-bold leading-none",
             dark
               ? "text-gray-400 hover:text-white"
-              : "text-gray-600 hover:text-black"
+              : "text-gray-600 hover:text-black",
           )}
           aria-label="Close"
         >
@@ -45,13 +46,15 @@ const AboutDialog: React.FC<AboutDialogProps> = ({ isOpen, onClose, dark }) => {
 
         {/* --- Developer Section --- */}
         <div className="flex flex-col items-center mb-6 border-b border-gray-600 pb-4">
-          {/* Developer Image Placeholder */}
-          <div className="size-30 rounded-full bg-blue-500 flex items-center justify-center mb-3 overflow-hidden">
-            {/* <span className="text-white text-xl font-bold">Dev</span> */}
+          <div className="size-24 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mb-3 overflow-hidden shadow-inner">
             <img
               src={image}
-              alt="Developer"
+              alt="Oakkar Nyunt - Developer"
+              loading="eager" // Load developer profile immediately as it's the main focus
+              decoding="async" // Off-thread decoding to prevent UI jank
               className="w-full h-full object-cover"
+              width="96" // Explicit dimensions prevent Layout Shift (CLS)
+              height="96"
             />
           </div>
 
@@ -68,8 +71,13 @@ const AboutDialog: React.FC<AboutDialogProps> = ({ isOpen, onClose, dark }) => {
           </p>
         </div>
 
-        {/* --- Description & Sponsor --- */}
-        <p className={clsx("mb-6 text-center italic", textClass)}>
+        {/* --- Description --- */}
+        <p
+          className={clsx(
+            "mb-6 text-center italic text-sm leading-relaxed",
+            textClass,
+          )}
+        >
           "This application is designed to help users master the Pyidaungsu
           Myanmar Unicode keyboard layout efficiently and accurately."
         </p>
@@ -79,52 +87,38 @@ const AboutDialog: React.FC<AboutDialogProps> = ({ isOpen, onClose, dark }) => {
             Main Sponsor
           </h3>
 
-          <div className="flex justify-between items-center">
-            <span className={clsx("font-semibold", textClass)}>Ko Min Thu</span>
-          </div>
-
-          <div className="flex justify-between items-center">
-            <span className={headerClass}>
-              MT PRO Computer Sale,Service and Training Center
-            </span>
-          </div>
-
-          <div className="flex justify-between items-center">
-            <span className={clsx("text-blue-400", headerClass)}>
+          <div className="text-center space-y-1">
+            <p className={clsx("font-semibold", textClass)}>Ko Min Thu</p>
+            <p className={clsx("text-sm", headerClass)}>
+              MT PRO Computer Sale, Service and Training
+            </p>
+            <p className={clsx("text-xs text-blue-400")}>
               Tachileik, Shan State, Myanmar
-            </span>
-          </div>
-
-          <div className="flex justify-between items-center">
-            <span className={clsx("text-blue-400", headerClass)}>
-              Phone: 09265448751
-            </span>
+            </p>
+            <p className={clsx("text-xs text-blue-400")}>Phone: 09265448751</p>
           </div>
 
           <div className="flex justify-center pt-4">
-            {/* Sponsor Logo Container (w-32 h-12) */}
             <div
               className={clsx(
-                "size-50 flex items-center justify-center border rounded overflow-hidden", // Added overflow-hidden for safety
-                dark ? "border-gray-600" : "border-gray-300"
+                "w-40 h-40 flex items-center justify-center border rounded-lg overflow-hidden bg-white p-2",
+                dark ? "border-gray-600" : "border-gray-300",
               )}
             >
-              {/* 🔑 CORRECTED JSX: The <img> tag is now a direct child of the size/border container */}
-              {/* Use a condition to show a placeholder if the URL is missing */}
               {MTPRO ? (
                 <img
-                  // Assuming 'image' in your original snippet refers to sponsorLogoUrl prop
                   src={MTPRO}
-                  alt="Sponsor Logo"
-                  // Use object-contain to ensure the logo fits without cropping
+                  alt="MT PRO Sponsor Logo"
+                  loading="lazy" // Lazy load the sponsor logo to save initial bandwidth
+                  decoding="async"
                   className="w-full h-full object-contain"
+                  width="160"
+                  height="160"
                 />
               ) : (
-                // Fallback text if the URL is empty
                 <span className={textClass}>Logo Missing</span>
               )}
             </div>
-            {/* Removed the extra/empty <img> tag and the extra <div> block */}
           </div>
         </div>
       </div>
