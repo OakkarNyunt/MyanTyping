@@ -439,14 +439,21 @@ const MyanmarTyping: React.FC = () => {
           handleVirtualKey={handleVirtualKey}
           lastPressedChar={lastPressedChar}
         />
-        <div className="flex justify-center items-center mt-2">
+        <div className="flex flex-col items-center gap-3 mt-4">
           <p
-            className={`text-md lg:text-xl font-bold ${
-              dark ? "text-white" : "text-black"
-            }`}
+            className={`text-md lg:text-xl font-bold ${dark ? "text-white" : "text-black"}`}
           >
             Developed by Oakkar Nyunt
           </p>
+
+          <a
+            href="https://myanmartypinggame.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200 shadow-md"
+          >
+            Go To Easy Typing Game
+          </a>
         </div>
         {/* Modal */}
         {modalOpen && (
